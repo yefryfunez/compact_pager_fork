@@ -31,6 +31,9 @@ Rectangle {
 	property color fontColor: plasmoid.configuration.fontColorChecked ? 
 			plasmoid.configuration.fontColor : Kirigami.Theme.textColor
 	property bool showWindowIndicator: true
+	property bool isPanelHorizontal:
+		plasmoid.location === PlasmaCore.Types.TopEdge ||
+		plasmoid.location === PlasmaCore.Types.BottomEdge
 
 	border.width: plasmoid.configuration.displayBorder ? plasmoid.configuration.borderThickness : 0
 	radius: height > width ? height * (plasmoid.configuration.borderRadius / 100) : width * (plasmoid.configuration.borderRadius / 100)
@@ -38,7 +41,6 @@ Rectangle {
 	Text {
 		id: sizeRefText
 		visible: false
-		// color: "red"
 		text: numberBox.text
 		font {
 			family: plasmoid.configuration.fontFamily || Kirigami.Theme.defaultFont.family
@@ -48,11 +50,11 @@ Rectangle {
 		}
 	}
 
-	Layout.minimumWidth: sizeRefText.width + 10
-	Layout.minimumHeight: sizeRefText.height
+	Layout.minimumWidth: isPanelHorizontal ? sizeRefText.width + 15 : sizeRefText
+	Layout.minimumHeight: isPanelHorizontal ? sizeRefText.height : sizeRefText.width + 15
 
-	Layout.preferredWidth: sizeRefText.width + 10
-	Layout.preferredHeight: sizeRefText.height
+	Layout.preferredWidth: isPanelHorizontal && iconGrid.showAllIcons && plasmoid.configuration.showWindowIcons ? iconGrid.iconSize * tasksModel.count + 15 : sizeRefText.width
+	Layout.preferredHeight: !isPanelHorizontal && iconGrid.showAllIcons && plasmoid.configuration.showWindowIcons ? iconGrid.iconSize * tasksModel.count + 15 : sizeRefText.height
 
 	Layout.fillWidth: Plasmoid.formFactor != PlasmaCore.Types.Horizontal
 	Layout.fillHeight: Plasmoid.formFactor != PlasmaCore.Types.Vertical
@@ -74,10 +76,10 @@ Rectangle {
 
 	Text {
 		id: numberText
-		visible: !plasmoid.configuration.showWindowIcons
+		visible: !plasmoid.configuration.showWindowIcons || tasksModel.count === 0
 
 		anchors.centerIn: parent
-		width: parent.width - 10
+		width: parent.width
 		height: parent.height
 		horizontalAlignment: Text.AlignHCenter
 		verticalAlignment: Text.AlignVCenter
@@ -96,13 +98,14 @@ Rectangle {
 	Grid {
 		id: iconGrid
 		anchors.centerIn: parent
-		visible: plasmoid.configuration.showWindowIcons
+		visible: plasmoid.configuration.showWindowIcons && tasksModel.count > 0
+		spacing: 2
 
-		readonly property bool showIconsInColumn: numberBox.height > numberBox.width
-		readonly property bool showAllIcons: iconSize > 6
+		readonly property bool showIconsInColumn: !isPanelHorizontal
+		readonly property bool showAllIcons: tasksModel.count <= plasmoid.configuration.iconsPerDesktop
 		readonly property int shorterSide: Math.min(numberBox.height, numberBox.width)
-		readonly property int longerSide: Math.max(numberBox.height, numberBox.width)
-		readonly property int iconSize: Math.min(shorterSide * 0.8, (longerSide - 4) / tasksModel.count)
+		readonly property int iconSize: shorterSide * 0.85
+		
 
 		columns: (showIconsInColumn || !showAllIcons) ? 1 : tasksModel.count
 		rows: (showIconsInColumn && showAllIcons) ? tasksModel.count : 1
@@ -123,8 +126,8 @@ Rectangle {
 		}
 
 		Kirigami.Icon {
-			height: iconGrid.shorterSide * 0.7
-			width: iconGrid.shorterSide * 0.7
+			height: iconGrid.shorterSide * 0.9
+			width: iconGrid.shorterSide * 0.9
 			roundToIconSize: false
 			visible: !iconGrid.showAllIcons
 			source: iconGrid.showIconsInColumn ? "view-more-symbolic" : "view-more-horizontal-symbolic"

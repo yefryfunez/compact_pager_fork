@@ -87,14 +87,14 @@
 		"Description[zh_TW]": "在虛擬桌面間切換",
 		"EnabledByDefault": false,
 		"Icon": "user-desktop",
-		"Id": "com.github.tilorenz.compact_pager",
+		"Id": "com.github.tilorenz.compact_pager_fork",
 		"License": "GPL-3.0+",
 		"Name": "Compact Pager",
 		"Name[de]": "Compact Pager",
 		"Name[fr]": "Compact Pager",
 		"Name[ru]": "Compact Pager",
 		"Version": "3.12",
-		"Website": "https://github.com/tilorenz/compact_pager"
+		"Website": "https://github.com/tilorenz/compact_pager_fork"
 	},
 	"X-Plasma-API-Minimum-Version": "6.0",
 	"X-Plasma-NotificationArea": "true",

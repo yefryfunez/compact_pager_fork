@@ -12,7 +12,11 @@
 		</entry>
 		<entry name="showWindowIcons" type="Bool">
 			<label>Show window icons rather than numbers</label>
-			<default>false</default>
+			<default>true</default>
+		</entry>
+		<entry name="iconsPerDesktop" type="Int">
+			<label>Define number of window icons to show per desktop</label>
+			<default>3</default>
 		</entry>
 		<entry name="showOnlyCurrentScreen" type="Bool">
 			<label>Only show windows from current Screen in pager</label>
@@ -58,11 +62,11 @@
 		<entry name="forceLayout" type="Enum">
 			<label>Which layout to use.</label>
 			<choices>
-				<choice name="Adaptive">
-					<tooltip>Switch the layout depending on available space.</tooltip>
-				</choice>
 				<choice name="Full">
 					<tooltip>Always show full layout.</tooltip>
+				</choice>
+				<choice name="Adaptive">
+					<tooltip>Switch the layout depending on available space.</tooltip>
 				</choice>
 				<choice name="Compact">
 					<tooltip>Always show compact layout.</tooltip>

@@ -39,6 +39,7 @@ KCM.SimpleKCM {
 	property alias cfg_showWindowIcons: showWindowIcons.checked
 	property alias cfg_showOnlyCurrentScreen: showOnlyCurrentScreen.checked
 	property alias cfg_hideDesktopsWithoutWindows: hideDesktopsWithoutWindows.checked
+	property alias cfg_iconsPerDesktop: iconsPerDesktop.value
 
 	Kirigami.FormLayout {
 		id: layoutGeneral
@@ -105,6 +106,14 @@ KCM.SimpleKCM {
 		QtControls.RadioButton {
 			id: showWindowIcons
 			text: i18n("Show window icons")
+		}
+
+		QtControls.SpinBox {
+			id: iconsPerDesktop
+			enabled: showWindowIcons.checked
+			Kirigami.FormData.label: i18n("Number of icons per desktop:")
+			from: 1
+			stepSize: 1
 		}
 
 		Item {
