@@ -36,7 +36,7 @@ Rectangle {
 		plasmoid.location === PlasmaCore.Types.BottomEdge
 
 	border.width: plasmoid.configuration.displayBorder ? plasmoid.configuration.borderThickness : 0
-	radius: height > width ? height * (plasmoid.configuration.borderRadius / 100) : width * (plasmoid.configuration.borderRadius / 100)
+	radius: plasmoid.configuration.borderRadius
 
 	Text {
 		id: sizeRefText

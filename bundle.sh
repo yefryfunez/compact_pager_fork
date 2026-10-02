@@ -1,3 +1,2 @@
 rm package.plasmoid
-zip -r package.plasmoid package 
-
+zip -r package.plasmoid package
