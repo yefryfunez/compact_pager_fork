@@ -26,14 +26,14 @@ import org.kde.kirigami as Kirigami
 
 Rectangle {
 	id: numberBox
-	property alias text: numberText.text 
+	property alias text: numberText.text
 	property bool fontSizeChecked: plasmoid.configuration.fontSizeChecked
-	property color fontColor: plasmoid.configuration.fontColorChecked ? 
-			plasmoid.configuration.fontColor : Kirigami.Theme.textColor
-	property bool showWindowIndicator: true
+	property color fontColor: plasmoid.configuration.fontColorChecked ?
+	plasmoid.configuration.fontColor : Kirigami.Theme.textColor
+	//property bool showWindowIndicator: true
 	property bool isPanelHorizontal:
-		plasmoid.location === PlasmaCore.Types.TopEdge ||
-		plasmoid.location === PlasmaCore.Types.BottomEdge
+	plasmoid.location === PlasmaCore.Types.TopEdge ||
+	plasmoid.location === PlasmaCore.Types.BottomEdge
 
 	border.width: plasmoid.configuration.displayBorder ? plasmoid.configuration.borderThickness : 0
 	radius: plasmoid.configuration.borderRadius
@@ -50,7 +50,7 @@ Rectangle {
 		}
 	}
 
-	Layout.minimumWidth: isPanelHorizontal ? sizeRefText.width + 15 : sizeRefText
+	Layout.minimumWidth: isPanelHorizontal ? sizeRefText.width + 15 : sizeRefText.height
 	Layout.minimumHeight: isPanelHorizontal ? sizeRefText.height : sizeRefText.width + 15
 
 	Layout.preferredWidth: isPanelHorizontal && iconGrid.showAllIcons && plasmoid.configuration.showWindowIcons ? iconGrid.iconSize * tasksModel.count + 15 : sizeRefText.width
@@ -58,22 +58,22 @@ Rectangle {
 
 	Layout.fillWidth: Plasmoid.formFactor != PlasmaCore.Types.Horizontal
 	Layout.fillHeight: Plasmoid.formFactor != PlasmaCore.Types.Vertical
-
-	Rectangle {
-		id: windowIndicator
-		visible: numberBox.showWindowIndicator
-
-		anchors.left: numberText.right
-		anchors.top: numberText.top
-
-		width: 8
-		height: 8
-		border.color: numberBox.fontColor
-		border.width: 1
-		color: "transparent"
-		radius: width * (plasmoid.configuration.windowIndicatorRadius / 100)
-	}
-
+	/*
+	 *	Rectangle {
+	 *		id: windowIndicator
+	 *		visible: numberBox.showWindowIndicator
+	 *
+	 *		anchors.left: numberText.right
+	 *		anchors.top: numberText.top
+	 *
+	 *		width: 8
+	 *		height: 8
+	 *		border.color: numberBox.fontColor
+	 *		border.width: 1
+	 *		color: "transparent"
+	 *		radius: width * (plasmoid.configuration.windowIndicatorRadius / 100)
+}
+*/
 	Text {
 		id: numberText
 		visible: !plasmoid.configuration.showWindowIcons || tasksModel.count === 0
@@ -95,6 +95,9 @@ Rectangle {
 		minimumPixelSize: Kirigami.Theme.smallFont.pixelSize
 	}
 
+	// true: muestra la cantidad de ventanas (2, 3, ... 9+). false: muestra solo "+"
+	property bool showWindowCountNumber: true
+
 	Grid {
 		id: iconGrid
 		anchors.centerIn: parent
@@ -105,7 +108,7 @@ Rectangle {
 		readonly property bool showAllIcons: tasksModel.count <= plasmoid.configuration.iconsPerDesktop
 		readonly property int shorterSide: Math.min(numberBox.height, numberBox.width)
 		readonly property int iconSize: shorterSide * 0.85
-		
+
 
 		columns: (showIconsInColumn || !showAllIcons) ? 1 : tasksModel.count
 		rows: (showIconsInColumn && showAllIcons) ? tasksModel.count : 1
@@ -119,11 +122,57 @@ Rectangle {
 
 		Repeater {
 			model: tasksModel
-			BoxIcon {
+
+			Item {
+				id: iconItem
+				width: iconGrid.iconSize
+				height: iconGrid.iconSize
 				visible: iconGrid.showAllIcons
-				source: model.decoration
+
+				// Con GroupApplications, ChildCount vale 0 para una ventana suelta
+				// y N para un grupo de N ventanas de la misma app en este escritorio.
+				// Se lee como rol del delegate (model.ChildCount) para que el binding
+				// se actualice solo cuando se abren o cierran ventanas.
+				readonly property int windowCount: model.ChildCount > 0 ? model.ChildCount : 1
+				readonly property bool hasMultipleWindows: windowCount > 1
+
+				BoxIcon {
+					anchors.fill: parent
+					source: model.decoration
+				}
+
+				Rectangle {
+					id: countBadge
+					visible: iconItem.hasMultipleWindows
+
+					anchors.right: parent.right
+					anchors.bottom: parent.bottom
+					anchors.bottomMargin: -2
+					anchors.rightMargin: -2
+
+					height: Math.round(Math.max(10, iconGrid.iconSize * 0.6))
+					width: Math.max(height, countText.implicitWidth + 4)
+					radius: height / 2
+
+					color: Kirigami.Theme.highlightColor
+					//border.width: 0
+					border.color: Kirigami.Theme.backgroundColor
+
+					Text {
+						id: countText
+						anchors.centerIn: parent
+
+						text: !numberBox.showWindowCountNumber ? "+"
+						: (iconItem.windowCount > 9 ? "9+" : iconItem.windowCount)
+
+						color: Kirigami.Theme.highlightedTextColor
+						font.bold: true
+						font.pixelSize: Math.round(countBadge.height * 0.7)
+					}
+				}
 			}
 		}
+
 
 		Kirigami.Icon {
 			height: iconGrid.shorterSide * 0.9

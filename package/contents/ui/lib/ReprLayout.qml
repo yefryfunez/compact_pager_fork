@@ -131,14 +131,13 @@ GridLayout {
 				id: tasksModel
 				filterByVirtualDesktop: true
 				virtualDesktop: desktopId
-				groupMode: TasksModel.GroupDisabled
+				groupMode: TasksModel.GroupApplications //GroupDisabled
 				screenGeometry: root.screenGeometry
 				filterByScreen: plasmoid.configuration.showOnlyCurrentScreen
 				filterByActivity: true
 				activity: activityModel.currentActivity
 			}
 
-			showWindowIndicator: plasmoid.configuration.showWindowIndicator && tasksModel.count > 0
 
 			DnD.DropArea {
 				id: droparea
