@@ -30,7 +30,6 @@ Rectangle {
 	property bool fontSizeChecked: plasmoid.configuration.fontSizeChecked
 	property color fontColor: plasmoid.configuration.fontColorChecked ?
 	plasmoid.configuration.fontColor : Kirigami.Theme.textColor
-	//property bool showWindowIndicator: true
 	property bool isPanelHorizontal:
 	plasmoid.location === PlasmaCore.Types.TopEdge ||
 	plasmoid.location === PlasmaCore.Types.BottomEdge
@@ -58,22 +57,7 @@ Rectangle {
 
 	Layout.fillWidth: Plasmoid.formFactor != PlasmaCore.Types.Horizontal
 	Layout.fillHeight: Plasmoid.formFactor != PlasmaCore.Types.Vertical
-	/*
-	 *	Rectangle {
-	 *		id: windowIndicator
-	 *		visible: numberBox.showWindowIndicator
-	 *
-	 *		anchors.left: numberText.right
-	 *		anchors.top: numberText.top
-	 *
-	 *		width: 8
-	 *		height: 8
-	 *		border.color: numberBox.fontColor
-	 *		border.width: 1
-	 *		color: "transparent"
-	 *		radius: width * (plasmoid.configuration.windowIndicatorRadius / 100)
-}
-*/
+
 	Text {
 		id: numberText
 		visible: !plasmoid.configuration.showWindowIcons || tasksModel.count === 0
@@ -129,10 +113,6 @@ Rectangle {
 				height: iconGrid.iconSize
 				visible: iconGrid.showAllIcons
 
-				// Con GroupApplications, ChildCount vale 0 para una ventana suelta
-				// y N para un grupo de N ventanas de la misma app en este escritorio.
-				// Se lee como rol del delegate (model.ChildCount) para que el binding
-				// se actualice solo cuando se abren o cierran ventanas.
 				readonly property int windowCount: model.ChildCount > 0 ? model.ChildCount : 1
 				readonly property bool hasMultipleWindows: windowCount > 1
 
