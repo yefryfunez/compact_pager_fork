@@ -52,8 +52,12 @@ Rectangle {
 	Layout.minimumWidth: isPanelHorizontal ? sizeRefText.width + 15 : sizeRefText.height
 	Layout.minimumHeight: isPanelHorizontal ? sizeRefText.height : sizeRefText.width + 15
 
-	Layout.preferredWidth: isPanelHorizontal && iconGrid.showAllIcons && plasmoid.configuration.showWindowIcons ? iconGrid.iconSize * tasksModel.count + 15 : sizeRefText.width
-	Layout.preferredHeight: !isPanelHorizontal && iconGrid.showAllIcons && plasmoid.configuration.showWindowIcons ? iconGrid.iconSize * tasksModel.count + 15 : sizeRefText.height
+	Layout.preferredWidth: isPanelHorizontal && iconGrid.showAllIcons && plasmoid.configuration.showWindowIcons ?
+		(iconGrid.iconSize * (tasksModel.count <= plasmoid.configuration.iconsPerDesktop + 1 ? tasksModel.count : plasmoid.configuration.iconsPerDesktop + 1) + 15)
+		: sizeRefText.width
+	Layout.preferredHeight: !isPanelHorizontal && iconGrid.showAllIcons && plasmoid.configuration.showWindowIcons ?
+		(iconGrid.iconSize * (tasksModel.count <= plasmoid.configuration.iconsPerDesktop + 1 ? tasksModel.count : plasmoid.configuration.iconsPerDesktop + 1) + 15)
+		: sizeRefText.height
 
 	Layout.fillWidth: Plasmoid.formFactor != PlasmaCore.Types.Horizontal
 	Layout.fillHeight: Plasmoid.formFactor != PlasmaCore.Types.Vertical
@@ -89,7 +93,7 @@ Rectangle {
 		spacing: 2
 
 		readonly property bool showIconsInColumn: !isPanelHorizontal
-		readonly property bool showAllIcons: tasksModel.count <= plasmoid.configuration.iconsPerDesktop
+		readonly property bool showAllIcons: true
 		readonly property int shorterSide: Math.min(numberBox.height, numberBox.width)
 		readonly property int iconSize: shorterSide * 0.85
 
@@ -107,23 +111,31 @@ Rectangle {
 		Repeater {
 			model: tasksModel
 
-			Item {
+			delegate: Item {
 				id: iconItem
 				width: iconGrid.iconSize
 				height: iconGrid.iconSize
-				visible: iconGrid.showAllIcons
+				visible: iconGrid.showAllIcons && appIndex <= plasmoid.configuration.iconsPerDesktop
 
+				property int appIndex: index
 				readonly property int windowCount: model.ChildCount > 0 ? model.ChildCount : 1
 				readonly property bool hasMultipleWindows: windowCount > 1
 
 				BoxIcon {
 					anchors.fill: parent
 					source: model.decoration
+					visible: appIndex < plasmoid.configuration.iconsPerDesktop
 				}
-
+				Kirigami.Icon {
+					height: iconGrid.shorterSide * 0.8
+					width: iconGrid.shorterSide * 0.8
+					roundToIconSize: true
+					visible: iconItem.appIndex == plasmoid.configuration.iconsPerDesktop
+					source: iconGrid.showIconsInColumn ? "view-more-symbolic" : "view-more-horizontal-symbolic"
+				}
 				Rectangle {
 					id: countBadge
-					visible: iconItem.hasMultipleWindows
+					visible: iconItem.hasMultipleWindows && iconItem.appIndex < plasmoid.configuration.iconsPerDesktop
 
 					anchors.right: parent.right
 					anchors.bottom: parent.bottom
@@ -141,7 +153,6 @@ Rectangle {
 					Text {
 						id: countText
 						anchors.centerIn: parent
-
 						text: !numberBox.showWindowCountNumber ? "+"
 						: (iconItem.windowCount > 9 ? "9+" : iconItem.windowCount)
 
@@ -151,15 +162,6 @@ Rectangle {
 					}
 				}
 			}
-		}
-
-
-		Kirigami.Icon {
-			height: iconGrid.shorterSide * 0.9
-			width: iconGrid.shorterSide * 0.9
-			roundToIconSize: false
-			visible: !iconGrid.showAllIcons
-			source: iconGrid.showIconsInColumn ? "view-more-symbolic" : "view-more-horizontal-symbolic"
 		}
 	}
 
